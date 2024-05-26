@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, flash, redirect, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
-from forms import UserAddForm, LoginForm, MessageForm
+from forms import UserAddForm, LoginForm, MessageForm, UserUpdateForm
 from models import db, connect_db, User, Message
 import pdb
 CURR_USER_KEY = "curr_user"
@@ -115,7 +115,6 @@ def login():
 def logout():
     """Handle logout of user."""
 
-    # IMPLEMENT THIS
     
     flash(f"logged out!", "success")
     do_logout()
@@ -224,6 +223,41 @@ def profile():
 
     # IMPLEMENT THIS
 
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+    
+    form = UserUpdateForm()
+
+    if form.validate_on_submit():
+
+        user = User.authenticate(
+            username=g.user.username,
+            password=form.password.data
+        )
+
+        if not user:
+            return redirect("/")
+        
+        try:
+            User.update_user(
+                username=form.username.data or User.username.default.arg,
+                email=form.email.data or User.email.default.arg,
+                image_url=form.image_url.data or User.image_url.default.arg,
+                bio=form.bio.data or User.bio.default.arg,
+                header_image_url=form.header_image_url.data or User.header_image_url.default.arg,
+                user_id=user.id
+            )
+
+        except IntegrityError:
+            flash("Username already taken", 'danger')
+            return render_template('users/edit.html', form=form)
+
+
+        return redirect(f"/users/{g.user.id}")
+
+    else:
+        return render_template('users/edit.html', form=form)
 
 @app.route('/users/delete', methods=["POST"])
 def delete_user():

@@ -148,6 +148,32 @@ class User(db.Model):
 
         db.session.add(user)
         return user
+    
+    @classmethod
+    def update_user(cls, user_id, username, email, image_url, bio, header_image_url):
+        """Sign up user.
+
+        Hashes password and adds user to system.
+        """
+        
+        # hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
+        user = cls.query.get(user_id)
+
+        if user:
+            # Update the email
+            user.username = username
+            user.email = email
+            user.bio = bio
+            user.header_image_url = header_image_url
+            user.image_url = image_url
+
+            # Commit the changes to persist them in the database
+            db.session.commit()
+            return True
+        else:
+            return False
+        
+       
 
     @classmethod
     def authenticate(cls, username, password):
