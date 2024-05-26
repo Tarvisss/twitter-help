@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm
 from models import db, connect_db, User, Message
-
+import pdb
 CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
@@ -20,9 +20,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
+app.app_context().push()
 toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
+
 
 
 ##############################################################################
@@ -44,8 +46,8 @@ def do_login(user):
     """Log in user."""
 
     session[CURR_USER_KEY] = user.id
-
-
+    
+    
 def do_logout():
     """Logout user."""
 
@@ -64,7 +66,7 @@ def signup():
     If the there already is a user with that username: flash message
     and re-present form.
     """
-
+    
     form = UserAddForm()
 
     if form.validate_on_submit():
@@ -92,7 +94,7 @@ def signup():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     """Handle user login."""
-
+    
     form = LoginForm()
 
     if form.validate_on_submit():
@@ -114,7 +116,10 @@ def logout():
     """Handle logout of user."""
 
     # IMPLEMENT THIS
-
+    
+    flash(f"logged out!", "success")
+    do_logout()
+    return redirect("/login")
 
 ##############################################################################
 # General user routes:
@@ -144,13 +149,19 @@ def users_show(user_id):
 
     # snagging messages in order from the database;
     # user.messages won't be in order by default
+    header_image_url = user.header_image_url
+    bio = user.bio
+    location = user.location
     messages = (Message
                 .query
                 .filter(Message.user_id == user_id)
                 .order_by(Message.timestamp.desc())
                 .limit(100)
                 .all())
-    return render_template('users/show.html', user=user, messages=messages)
+    return render_template('users/show.html', user=user, messages=messages,
+                            location=location,
+                            bio=bio,
+                            header_image_url=header_image_url)
 
 
 @app.route('/users/<int:user_id>/following')

@@ -1,7 +1,7 @@
 """SQLAlchemy models for Warbler."""
 
 from datetime import datetime
-
+import pdb
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
@@ -188,7 +188,7 @@ class Message(db.Model):
     timestamp = db.Column(
         db.DateTime,
         nullable=False,
-        default=datetime.utcnow(),
+        default=datetime.now(),
     )
 
     user_id = db.Column(
