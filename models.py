@@ -150,23 +150,20 @@ class User(db.Model):
         return user
     
     @classmethod
-    def update_user(cls, user_id, username, email, image_url, bio, header_image_url):
-        """Sign up user.
-
-        Hashes password and adds user to system.
-        """
+    def update_user(cls, user_id, username, email, image_url, bio, header_image_url, location):
+        """Updates user."""
         
-        # hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
+        
         user = cls.query.get(user_id)
 
         if user:
-            # Update the email
+           
             user.username = username
             user.email = email
             user.bio = bio
             user.header_image_url = header_image_url
             user.image_url = image_url
-
+            user.location = location
             # Commit the changes to persist them in the database
             db.session.commit()
             return True
@@ -214,6 +211,8 @@ class Message(db.Model):
     timestamp = db.Column(
         db.DateTime,
         nullable=False,
+        # utcnow is depreciated
+        # default=datetime.now().strftime('%d/%m/%Y, %H:%M:%S'),
         default=datetime.now(),
     )
 

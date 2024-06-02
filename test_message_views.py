@@ -71,3 +71,10 @@ class MessageViewTestCase(TestCase):
 
             msg = Message.query.one()
             self.assertEqual(msg.text, "Hello")
+
+    def test_ivalid_user_message(self):
+
+        with self.client as c:
+            response = c.post("/messages/new", data={"text": "Hello"}, follow_redirects=True)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("Access unauthorized", str(response.data))

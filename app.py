@@ -277,6 +277,7 @@ def profile():
                 email=form.email.data or User.email.default.arg,
                 image_url=form.image_url.data or User.image_url.default.arg,
                 bio=form.bio.data or User.bio.default.arg,
+                location=form.location.data or User.location.default.arg,
                 header_image_url=form.header_image_url.data or User.header_image_url.default.arg,
                 user_id=user.id
             )
